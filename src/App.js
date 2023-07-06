@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 function App() {
   const [screen, setScreen] = useState('Initial');
-  const [location, setLocation] = useState('');
+ // const [location, setLocation] = useState('');
   const [name, setName] = useState('');
   const queryParameters = new URLSearchParams(window.location.search);
   const token = queryParameters.get('token');
