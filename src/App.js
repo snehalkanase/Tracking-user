@@ -11,7 +11,7 @@ function App() {
   const queryParameters = new URLSearchParams(window.location.search);
   const token = queryParameters.get('token');
 // const [PermissionStatus, setPermissionStatus] = useState('')
-const checkPermission = ()=>{
+const checkPermission = React.useCallback(()=>{
   if('geolocation' in navigator){
     navigator.permissions.query({name: 'geolocation'}).then(result => {
        if(result.state === "granted"){
@@ -29,7 +29,7 @@ const checkPermission = ()=>{
   else{
     setScreen('No-GPS')
   }
-}
+}, [])
 
   useEffect(() => {
     try {
@@ -46,7 +46,7 @@ const checkPermission = ()=>{
     } catch (error) {
       setScreen('Invalid');
     }
-  }, [token]);
+  },[token, checkPermission]);
 
 
   const requestPermission = () => {
