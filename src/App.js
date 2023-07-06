@@ -7,11 +7,13 @@ import React, { useEffect, useState } from 'react';
 
 function App() {
   const [screen, setScreen] = useState('Initial');
+  const [location, setLocation] = useState('');
   const [name, setName] = useState('');
   const queryParameters = new URLSearchParams(window.location.search);
   const token = queryParameters.get('token');
 // const [PermissionStatus, setPermissionStatus] = useState('')
 const checkPermission = React.useCallback(()=>{
+
   if('geolocation' in navigator){
     navigator.permissions.query({name: 'geolocation'}).then(result => {
        if(result.state === "granted"){
@@ -29,7 +31,7 @@ const checkPermission = React.useCallback(()=>{
   else{
     setScreen('No-GPS')
   }
-}, [])
+},[]);
 
   useEffect(() => {
     try {
@@ -53,7 +55,6 @@ const checkPermission = React.useCallback(()=>{
     navigator.geolocation.getCurrentPosition(
       (position)=>{
         console.log(position);
-        // console.log(position.coords.longitude);
         setScreen('Home') 
       },
       (error)=>{
@@ -63,6 +64,16 @@ const checkPermission = React.useCallback(()=>{
       { enableHighAccuracy: true, timeout: 5000 }
     );
   }
+
+  const getLocation = React.useCallback(() => {
+    if (!navigator.geolocation) {
+      console.log("Geolocation is not supported by your browser");
+    } else {
+      navigator.geolocation.getCurrentPosition((position) =>{
+        console.log(position)
+      });
+    }
+  }, [])
 
   switch (screen) {
     case 'Initial':
@@ -75,7 +86,6 @@ const checkPermission = React.useCallback(()=>{
       return (
         <div>
           <Home name={name} />
-
         </div>
       );
     case 'Expired':
@@ -98,12 +108,14 @@ const checkPermission = React.useCallback(()=>{
       return (
         <div>
           <Error image={'no_gps.svg'} title={'No GPS!'} subTitle={"Satellite can't find you"} />
+          <button onClick={getLocation}>get location</button>
         </div>
       );
     default:
       return (
         <div>
           <Error image={'no_gps.svg'} title={'Error'} subTitle={"Something went wrong"} />
+          <button onClick={getLocation}>get location</button>
         </div>
       );
   }
