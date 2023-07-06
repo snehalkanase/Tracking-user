@@ -1,0 +1,40 @@
+.primary-color{
+    background-color: #74a942;
+}
+
+.primary-light-color{
+   background-color: #d6d230;
+}
+.secondary-color{
+    background-color: #3d3d3d;
+}
+
+.secondary-light-color{
+   background-color: #787878;
+}
+
+.svg{
+    width: 150px;
+    display: block;
+    margin: auto auto;
+}
+
+*{
+    color: white;
+    text-align: center;
+    font-family: Poppins;
+    font-weight: 300;
+}
+
+.main{
+    height: 100vh;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+
+
+/* Home page */
+button{
+   margin: 10px;
+}
