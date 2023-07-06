@@ -40,10 +40,11 @@ export default function Home({ token, name }) {
     height: 720,
     facingMode: "user", 
   };
-
   const webcamRef = React.useRef(null);
 
+  
   const captureImage = React.useCallback(() => {
+    
     const imageSrc = webcamRef.current.getScreenshot();
     localStorage.setItem('capturedImage', imageSrc);
     setCameraActive(false); 

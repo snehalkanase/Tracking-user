@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 function App() {
   const [screen, setScreen] = useState('Initial');
-  // const [location, setLocation] = useState('');
+  const [location, setLocation] = useState('');
   const [name, setName] = useState('');
   const queryParameters = new URLSearchParams(window.location.search);
   const token = queryParameters.get('token');
@@ -70,7 +70,8 @@ const checkPermission = React.useCallback(()=>{
       console.log("Geolocation is not supported by your browser");
     } else {
       navigator.geolocation.getCurrentPosition((position) =>{
-        console.log(position)
+        console.log(position);
+        setScreen('Home')
       });
     }
   }, [])
@@ -119,5 +120,6 @@ const checkPermission = React.useCallback(()=>{
         </div>
       );
   }
+
 }
 export default App;
