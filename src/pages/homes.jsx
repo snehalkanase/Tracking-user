@@ -38,8 +38,10 @@ export default function Home({ token, name }) {
 
   const [imgData, setImgData] = useState(null);
   const [cameraActive, setCameraActive] = useState(false);
+  const [captureCount, setCaptureCount] = useState(0);
 
   const startCamera = () => {
+    setImgData(null);
     setCameraActive(true);
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
@@ -64,20 +66,26 @@ export default function Home({ token, name }) {
     setImgData(dataURL);
     setCameraActive(false);
     video.srcObject.getTracks()[0].stop();
+    setCaptureCount(captureCount + 1);
+  };
+
+  const resetCapture = () => {
+    setImgData(null);
+    setCaptureCount(0);
   };
 
   const submit = React.useCallback(() => {
-    if (!imgData && !mapLink.href) {
-      document.querySelector("p").textContent = "Provide photo and location";
-    } else if (!imgData) {
-      document.querySelector("p").textContent = "please capture Photo";
-    } else if (!mapLink.href) {
-      document.querySelector("p").textContent = "please Provide location";
+    setMapLink({ href: "", textContent: "" });
+
+    if (!navigator.geolocation) {
+      setStatus("Geolocation is not supported by your browser");
     } else {
-      console.log("Submitted Successfully");
+      setStatus("Locating…");
+      const location = navigator.geolocation.getCurrentPosition(success, error);
+      console.log(location);
+      localStorage.setItem("location")
     }
-    setSubmitted(true);
-  },[imgData, mapLink.href]);
+  }, [success, error]);
 
    const isButtonDisabled = submitted || !imgData || !mapLink.href;
 
@@ -90,30 +98,33 @@ export default function Home({ token, name }) {
             <h2>{name}</h2>
             <p></p>
           </div>
-          {!cameraActive && (
-            <div>
-              <button onClick={startCamera} className="primary-color">
-                Start Camera
-              </button>
-            </div>
-          )}
+          {!cameraActive && captureCount === 0 && (
+        <div>
+          <button onClick={startCamera} className="primary-color">Take Photo</button>
+        </div>
+      )}
+      {!cameraActive && captureCount > 0 && (
+        <div>
+          <button onClick={startCamera} className="primary-color">Retake Photo</button>
+        </div>
+      )}
 
           {cameraActive && (
             <div>
               <video id="videoPreview" width="100%" autoPlay></video>
               <button onClick={capturePhoto} className="primary-color">
-                Capture Photo
+                Click
               </button>
             </div>
           )}
 
-          <button className="primary-color" onClick={getLocation}>
+          {/* <button className="primary-color" onClick={getLocation}>
             Current Location
           </button>
           <p id="status">{status}</p>
           <a id="map-link" href={mapLink.href}>
             {mapLink.textContent}
-          </a>
+          </a> */}
 
           {imgData && (
             <div>
@@ -123,12 +134,10 @@ export default function Home({ token, name }) {
           )}
           <canvas id="photoCanvas" style={{ display: "none" }}></canvas>
 
-          {!submitted && (
-            <form onSubmit={submit}>
-              <button type="submit" className="primary-color" disabled={isButtonDisabled}>
+          {imgData && (
+              <button onClick={submit}  className="primary-color">
                 Submit
               </button>
-            </form>
           )}
 
           
