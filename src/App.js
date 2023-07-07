@@ -7,11 +7,9 @@ import React, { useEffect, useState } from 'react';
 
 function App() {
   const [screen, setScreen] = useState('Initial');
- // const [location, setLocation] = useState('');
   const [name, setName] = useState('');
   const queryParameters = new URLSearchParams(window.location.search);
   const token = queryParameters.get('token');
-// const [PermissionStatus, setPermissionStatus] = useState('')
 const checkPermission = React.useCallback(()=>{
 
   if('geolocation' in navigator){
@@ -80,7 +78,7 @@ const checkPermission = React.useCallback(()=>{
     case 'Initial':
       return (
         <div>
-          <Error image={'expired.svg'} title={'Please Wait'} subTitle={'Loading'} />
+          <Error image={'expired.svg'}  subTitle={'Loading'} />
         </div>
       );
     case 'Home':
@@ -107,16 +105,19 @@ const checkPermission = React.useCallback(()=>{
       );
     case 'No-GPS':
       return (
-        <div>
-          <Error image={'no_gps.svg'} title={'No GPS!'} subTitle={"Satellite can't find you"} />
-          <button onClick={getLocation}>get location</button>
+        <div className="main">
+          <div>
+            <img src={'/img/no_gps.svg'} alt="" className='svg' />
+            <h3>No GPS!</h3>
+            <h4>Satellite can't find you</h4>
+            <button onClick={getLocation} className="primary-color" >Turn on your location</button>
+        </div>
         </div>
       );
     default:
       return (
         <div>
           <Error image={'no_gps.svg'} title={'Error'} subTitle={"Something went wrong"} />
-          <button onClick={getLocation}>get location</button>
         </div>
       );
   }

@@ -1,11 +1,12 @@
-import React from "react";
+import React, {  useState } from "react";
 import "../style.css";
-import Webcam from 'react-webcam';
-// import Camera from "react-html5-camera-photo";
+
 
 export default function Home({ token, name }) {
+  //Location
   const [status, setStatus] = React.useState("");
   const [mapLink, setMapLink] = React.useState({ href: "", textContent: "" });
+  const [submitted, setSubmitted] = useState(false);
 
   const success = React.useCallback((position) => {
     const latitude = position.coords.latitude;
@@ -34,23 +35,52 @@ export default function Home({ token, name }) {
   }, [success, error]);
 
   // CAMERA
-  const [cameraActive, setCameraActive] = React.useState(true);
-  const videoConstraints = {
-    width: 380,
-    height: 720,
-    facingMode: "user", 
+
+  const [imgData, setImgData] = useState(null);
+  const [cameraActive, setCameraActive] = useState(false);
+
+  const startCamera = () => {
+    setCameraActive(true);
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          let video = document.getElementById("videoPreview");
+          video.srcObject = stream;
+          video.play();
+        })
+        .catch((error) => {
+          console.log("Enable to access camera: ", error);
+        });
+    }
   };
-  const webcamRef = React.useRef(null);
 
-  
-  const captureImage = React.useCallback(() => {
-    
-    const imageSrc = webcamRef.current.getScreenshot();
-    localStorage.setItem('capturedImage', imageSrc);
-    setCameraActive(false); 
-  }, [webcamRef]);
+  const capturePhoto = () => {
+    let video = document.getElementById("videoPreview");
+    let canvas = document.getElementById("photoCanvas");
+    let context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    let dataURL = canvas.toDataURL("image/png");
+    setImgData(dataURL);
+    setCameraActive(false);
+    video.srcObject.getTracks()[0].stop();
+  };
 
-   const savedImage = localStorage.getItem('capturedImage');
+  const submit = React.useCallback(() => {
+    if (!imgData && !mapLink.href) {
+      document.querySelector("p").textContent = "Provide photo and location";
+    } else if (!imgData) {
+      document.querySelector("p").textContent = "please capture Photo";
+    } else if (!mapLink.href) {
+      document.querySelector("p").textContent = "please Provide location";
+    } else {
+      console.log("Submitted Successfully");
+    }
+    setSubmitted(true);
+  },[imgData, mapLink.href]);
+
+   const isButtonDisabled = submitted || !imgData || !mapLink.href;
+
   return (
     <>
       <div className="main">
@@ -58,19 +88,24 @@ export default function Home({ token, name }) {
           <div className="heading">
             <h2>Welcome</h2>
             <h2>{name}</h2>
+            <p></p>
           </div>
-          {/* <button onClick={startCamera}>Start Camera</button> */}
-          {cameraActive ? (
-        <Webcam
-          audio={false}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={videoConstraints}
-        />
-      ) : (
-        <h2>{savedImage}</h2>
-      )} <br />
-          <button onClick={captureImage} disabled = {!cameraActive}>Capture Image</button>
+          {!cameraActive && (
+            <div>
+              <button onClick={startCamera} className="primary-color">
+                Start Camera
+              </button>
+            </div>
+          )}
+
+          {cameraActive && (
+            <div>
+              <video id="videoPreview" width="100%" autoPlay></video>
+              <button onClick={capturePhoto} className="primary-color">
+                Capture Photo
+              </button>
+            </div>
+          )}
 
           <button className="primary-color" onClick={getLocation}>
             Current Location
@@ -79,6 +114,24 @@ export default function Home({ token, name }) {
           <a id="map-link" href={mapLink.href}>
             {mapLink.textContent}
           </a>
+
+          {imgData && (
+            <div>
+              <h2>Preview</h2>
+              <img src={imgData} alt="Captured" style={{ maxWidth: "100%" }} />
+            </div>
+          )}
+          <canvas id="photoCanvas" style={{ display: "none" }}></canvas>
+
+          {!submitted && (
+            <form onSubmit={submit}>
+              <button type="submit" className="primary-color" disabled={isButtonDisabled}>
+                Submit
+              </button>
+            </form>
+          )}
+
+          
         </div>
       </div>
     </>

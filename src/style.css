@@ -1,5 +1,9 @@
 .primary-color{
     background-color: #74a942;
+    outline: none;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
 }
 
 .primary-light-color{
