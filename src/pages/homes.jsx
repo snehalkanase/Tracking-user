@@ -118,7 +118,7 @@ export default function Home({ token, name }) {
           {imgData && (
             <div>
               <h2>Preview</h2>
-              <img src={imgData} alt="Captured" style={{ maxWidth: "100%" }} />
+              <img src={imgData} alt="Captured" style={{ maxWidth: "200px", height: "250px"}} />
             </div>
           )}
           <canvas id="photoCanvas" style={{ display: "none" }}></canvas>
